@@ -1,166 +1,184 @@
+Świetnie 🙌 To zrobię Ci **finalny draft `README.md`** do wrzucenia w repo na GitHubie, w pełnym **ENGLISH** (bo to idzie na forum KDE).  
+Uwzględniam:
+
+- ✅ Twoją obecną treść,  
+- ✅ Poprawki językowe (typo `secounds` → `seconds`, dodanie że `konsole` = optional),  
+- ✅ Spójne nagłówki i opisy,  
+- ✅ **Bezpośrednie linki** do Twoich `.txt` installerów w repo (bazując na strukturze `main` z linka którego podałeś).  
+
+---
+
+# 📄 Final `README.md`
+
+```markdown
 # 🐬 Dolphin ServiceMenu Tools – KDE Addons Pack
 
-A collection of handy **ServiceMenu addons** for the **Dolphin file manager** (KDE Plasma).  
-They extend the right‑click (context) menu with powerful tools for everyday use:
+This is a collection of handy **ServiceMenu addons** for the **Dolphin file manager** (KDE Plasma).  
+They extend the right‑click (context) menu with powerful utilities for everyday use:
 
-- 📑 **Documents**: Convert PDF to TXT/PNG  
+- 📑 **Documents**: Convert PDF to TXT or PNG  
 - 🖼 **Images**: Resize, optimize, convert formats  
 - 🔤 **OCR**: Extract text from images  
-- 🎵🎬 **Multimedia**: Convert/rescale audio & video  
+- 🎵🎬 **Multimedia**: Convert or resize audio & video  
 - 📥 **Download videos** from the Internet (`yt-dlp`)  
-- 📸 **Screenshots**: Capture directly into the selected folder or modify existing PNG/JPG  
+- 📸 **Screenshots**: Capture directly into selected folder or modify existing images  
 
-All modules are lightweight **bash scripts** tied to `.desktop` entries in `~/.local/share/kio/servicemenus/`.
+All modules are lightweight **bash scripts** with corresponding `.desktop` entries in `~/.local/share/kio/servicemenus/`.
 
 ---
 
 ## ⚙️ Installation & Usage
 
-- Copy any `.txt` file → paste in terminal.
-- Hit enter and wait few secounds.
-- Pick `1 Install`.  
-- Dolphin → right‑click menu shows new entries.  
-- To remove → rerun script → pick `2 Uninstall`.  
+1. Open the `.txt` file of a tool (see links below).  
+2. Copy the entire contents.  
+3. Paste into a terminal and press Enter.  
+4. Wait a few seconds.  
+5. Choose option `1 Install`.  
+6. Restart/refresh Dolphin – the new context menu entries are ready.  
 
-No root access required — everything is installed into the user’s home (`~/.local/share/`).
+To uninstall: rerun the script → choose option `2 Uninstall`.  
+
+📌 Note: No root access required – everything installs to the user’s home (`~/.local/share/`).  
 
 ---
 
-# 📋 Quick Overview Table
+# 📋 Quick Overview
 
 | Module | Actions | Dependencies |
 |--------|---------|--------------|
-| **Documents Tools** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
-| **Images Tools** | `Resize (%)`, `Resize (px)`, `Optimize image`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
-| **OCR Tools** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
-| **Multimedia Tools** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
-| **Download Video Tools** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip/xsel`, `konsole`, `kdialog` |
-| **Screenshot Tools** | **Modify:** Optimize PNG/JPG, Convert formats. <br> **Take Screenshot:** Save new image via Spectacle | `spectacle`, `xclip/xsel`, `optipng`, `jpegoptim`, `imagemagick`, `kdialog` |
+| **[Documents Tools](./Documents-tools-terminal_paste_code.txt)** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
+| **[Images Tools](./Images-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)`, `Optimize`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
+| **[OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
+| **[Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
+| **[Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip`/`xsel`, `konsole` *(optional)*, `kdialog` |
+| **[Screenshot Tools](./Screenshot-tools-terminal_paste_code.txt)** | **Modify:** Optimize PNG/JPG, Convert.<br>**Take Screenshot:** Save new image via Spectacle | `spectacle`, `xclip`/`xsel`, `optipng`, `jpegoptim`, `imagemagick`, `kdialog` |
 
 ---
 
 ## 📦 Dependencies
 
-Each tool uses common Linux packages. Install them before using:
+Each module uses common Linux packages. Please install them first:
 
 ### Debian / Ubuntu / KDE Neon / Linux Mint
 ```bash
-sudo apt install ffmpeg ffprobe imagemagick optipng jpegoptim tesseract-ocr poppler-utils yt-dlp spectacle xclip
+sudo apt install ffmpeg ffprobe imagemagick optipng jpegoptim \
+tesseract-ocr poppler-utils yt-dlp spectacle xclip
 ```
 
 ### Arch Linux / Manjaro
 ```bash
-sudo pacman -S ffmpeg imagemagick optipng jpegoptim tesseract poppler yt-dlp spectacle xclip
+sudo pacman -S ffmpeg imagemagick optipng jpegoptim \
+tesseract poppler yt-dlp spectacle xclip
 ```
 
 ### Fedora
 ```bash
-sudo dnf install ffmpeg ImageMagick optipng jpegoptim tesseract poppler-utils yt-dlp spectacle xclip
+sudo dnf install ffmpeg ImageMagick optipng jpegoptim \
+tesseract poppler-utils yt-dlp spectacle xclip
 ```
 
 ### openSUSE
 ```bash
-sudo zypper install ffmpeg ImageMagick optipng jpegoptim tesseract poppler-tools yt-dlp spectacle xclip
+sudo zypper install ffmpeg ImageMagick optipng jpegoptim \
+tesseract poppler-tools yt-dlp spectacle xclip
 ```
 
 ---
 
-## 📂 Modules Overview
+## 📂 Modules in Detail
 
-### 📑 **Documents Tools**
-- **PDF → TXT**: Extract text using `pdftotext`.  
-- **PDF → PNG**: Render selected page ranges into images using `pdftoppm`.  
+### 📑 [Documents Tools](./Documents-tools-terminal_paste_code.txt)
+- **PDF → TXT**: extract text with `pdftotext`.  
+- **PDF → PNG**: render page ranges to images (`pdftoppm`).  
 
-Usage:  
-PPM (right‑click) on a PDF → *Modify selected file* → choose desired action.  
-
----
-
-### 🖼 **Images Tools**
-- **Resize % / px**: Scale images proportionally or to fixed dimensions (ImageMagick).  
-- **Optimize image**:  
-  - PNG → lossless optimization via `optipng`.  
-  - JPG → shrink size via `jpegoptim`.  
-- **Convert image**: Convert any supported format to: JPG, PNG, WebP, TIFF, BMP, GIF.  
-
-Usage:  
-PPM on image files → *Modify selected file* → select action.  
+**Usage:** Right‑click a PDF → *Modify selected file* → select action.  
 
 ---
 
-### 🔤 **OCR Tools**
-- **OCR → TXT**: Recognize text in image files (JPG/PNG/TIFF) using `tesseract`.  
-- Automatically creates a `*_ocr.txt` file.  
+### 🖼 [Images Tools](./Images-tools-terminal_paste_code.txt)
+- **Resize % / px**: scale proportionally or to fixed dimensions (ImageMagick).  
+- **Optimize**:  
+  - PNG → `optipng` (lossless)  
+  - JPG → `jpegoptim` (quality ≈85%)  
+- **Convert**: output to JPG, PNG, WebP, TIFF, BMP, GIF.  
 
-Usage:  
-PPM on an image → *Modify selected file* → «OCR to TXT».  
-
----
-
-### 🎵🎬 **Multimedia Tools**
-- **Convert**: Transform audio/video to common formats: MP3, WAV, FLAC, MP4, MOV, WebM, GIF.  
-- **Resize (MB)**: Shrink video/audio to a user‑specified file size, recalculating bitrate dynamically.  
-
-Usage:  
-PPM on media file → *Modify selected file* → Convert or Resize.  
+**Usage:** Right‑click on an image → *Modify selected file*.  
 
 ---
 
-### 📥 **Download Video Tools**
-- **Download video (paste URL)**:  
-  - Works on folder context (PPM in empty space).  
-  - Reads URL from clipboard (or asks via dialog).  
-  - Lets you choose format (MP3 audio / MP4 video with quality options).  
-  - Downloads via `yt-dlp` straight into the chosen folder.  
+### 🔤 [OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)
+- **OCR → TXT**: recognizes text in PNG/JPG/TIFF using `tesseract`.  
+- Results saved as `*_ocr.txt`.  
 
-Usage:  
-PPM on an empty spot in Dolphin → «Download video (paste URL)».  
+**Usage:** Right‑click an image → *Modify selected file* → OCR to TXT.  
 
 ---
 
-### 📸 **Screenshot Tools**
-1. **Modify Screenshot / Images**  
-   - Optimize existing PNG/JPG (optipng/jpegoptim).  
-   - Convert image format to JPG/PNG/WebP/TIFF/BMP/GIF.  
+### 🎵🎬 [Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)
+- **Convert**: transform audio/video into MP3, WAV, FLAC, MP4, MOV, WebM, GIF.  
+- **Resize (MB)**: shrink multimedia file to specified size, recalculating bitrate dynamically.  
+
+**Usage:** Right‑click a media file → *Modify selected file* → Convert/Resize.  
+
+---
+
+### 📥 [Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)
+- Adds context entry **“Download video (paste URL)”** available on folders.  
+- Reads URL from clipboard or prompt.  
+- Lets you choose: MP3 (audio) or MP4 (video, quality options).  
+- Downloads via `yt-dlp` into chosen folder.  
+
+**Usage:** Right‑click empty space in a folder → Download video.  
+
+---
+
+### 📸 [Screenshot Tools](./Screenshot-tools-terminal_paste_code.txt)
+1. **Modify Screenshot/Images**  
+   - Optimize (optipng/jpegoptim)  
+   - Convert format (JPG/PNG/WebP/TIFF/BMP/GIF)  
 
 2. **Take Screenshot & Save Here**  
-   - Appears when right‑clicking on empty folder space.  
-   - Runs **Spectacle** in chosen mode: Area / Full Screen / Active Window.  
-   - Automatically saves PNG into this folder.  
+   - Context action in empty folder space.  
+   - Runs **Spectacle**: Area / Full Screen / Active Window.  
+   - Saves screenshot PNG into this folder automatically.  
 
 ---
 
 ## 🖱️ Usage Summary
 
-- **On files** (PDF, images, videos, audio):  
-  PPM → *Modify selected file* → access extra tools.  
-- **On empty folder space**:  
-  - «Download video (paste URL)»  
-  - «Take screenshot and paste here»  
+- **On files** (PDF, images, media):  
+  Right‑click → *Modify selected file* → choose tool.  
+
+- **On empty folder area**:  
+  - *Download video (paste URL)*  
+  - *Take screenshot and paste here*  
 
 ---
 
-## 🌍 Languages
+## 🌍 Language Support
 
-All addons include localized names and messages in:  
-- Polish 🇵🇱  
-- German 🇩🇪  
-- French 🇫🇷  
-- Spanish 🇪🇸  
-- Italian 🇮🇹  
-- Russian 🇷🇺  
-- Chinese 🇨🇳  
+Each module is localized into:  
+- 🇵🇱 Polish  
+- 🇩🇪 German  
+- 🇫🇷 French  
+- 🇪🇸 Spanish  
+- 🇮🇹 Italian  
+- 🇷🇺 Russian  
+- 🇨🇳 Simplified Chinese  
 
-Fallback to English otherwise.  
+Fallback = English if `$LANG` not matched.  
 
 ---
 
-## 📋 Credits & Development
+## 📋 Development
 
-This pack combines simple **bash scripts** + **KDE ServiceMenus** to extend Dolphin.  
-It is designed as a **modular toolkit** – you can install only the modules you want.  
-Adding new tools is easy: drop a `.desktop` in `~/.local/share/kio/servicemenus` + add a helper script in `~/.local/share/dolphin-scripts/`.  
+This is a **modular toolkit** – install whatever modules you want.  
+To add your own tool:  
+- Create `.desktop` entry in `~/.local/share/kio/servicemenus/`.  
+- Place the script in `~/.local/share/dolphin-scripts/`.  
 
-Feel free to expand, customize, and share! 🚀  
+Everything is transparent, editable, and user‑level.  
+
+Feel free to expand, customize, and share 🚀  
 
 ---
