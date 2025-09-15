@@ -1,0 +1,190 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Take Screenshot & Save Here
+# Zapisuje screenshot (obszar / cały ekran / aktywne okno)
+# bezpośrednio do wybranego folderu w Dolphin
+# Dependencies: spectacle, kdialog, xclip/xsel
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;;
+    de) echo "$2" ;;
+    fr) echo "$3" ;;
+    es) echo "$4" ;;
+    it) echo "$5" ;;
+    ru) echo "$6" ;;
+    zh) echo "$7" ;;
+    *)  echo "$1" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  # --- Desktop Entry ---
+  cat > "$SERVICES/Take-Screenshot.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=PasteScreenshot
+Icon=camera-photo
+
+[Desktop Action PasteScreenshot]
+Name=Take screenshot and paste here
+Name[pl]=Zrób zrzut ekranu i wklej tutaj
+Name[de]=Screenshot erstellen und hier einfügen
+Name[fr]=Prendre une capture et coller ici
+Name[es]=Hacer captura y pegar aquí
+Name[it]=Cattura schermo e incolla qui
+Name[ru]=Сделать скриншот и вставить сюда
+Name[zh_CN]=截图并粘贴到此处
+Exec=$SCRIPTS/paste-screenshot.sh %f
+Icon=camera-photo
+EOF
+
+  # --- Script paste-screenshot.sh ---
+  cat > "$SCRIPTS/paste-screenshot.sh" <<'EOF2'
+#!/usr/bin/env bash
+# Script: paste-screenshot.sh
+lang=${LANG:0:2}
+target="$1"
+
+if [ -z "$target" ] || [ "$target" = "." ]; then
+  outdir="$(pwd)"
+elif [ -d "$target" ]; then
+  outdir="$target"
+else
+  outdir="$(dirname "$target")"
+fi
+
+mkdir -p "$outdir"
+outfile="$outdir/Screenshot_$(date +'%Y-%m-%d_%H-%M-%S').png"
+
+if ! command -v spectacle &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak Spectacle (sudo apt install spectacle)" ;;
+    de) kdialog --error "❌ Spectacle fehlt (sudo apt install spectacle)" ;;
+    fr) kdialog --error "❌ Spectacle est manquant (sudo apt install spectacle)" ;;
+    es) kdialog --error "❌ Falta Spectacle (sudo apt install spectacle)" ;;
+    it) kdialog --error "❌ Spectacle mancante (sudo apt install spectacle)" ;;
+    ru) kdialog --error "❌ Spectacle отсутствует (sudo apt install spectacle)" ;;
+    zh) kdialog --error "❌ 缺少 Spectacle (安装: sudo apt install spectacle)" ;;
+    *)  kdialog --error "❌ Spectacle not found" ;;
+  esac
+  exit 1
+fi
+
+# Teksty menu screena
+case $lang in
+  pl) title="Tryb zrzutu ekranu"; opt_area="Obszar"; opt_full="Pełny ekran"; opt_window="Aktywne okno" ;;
+  de) title="Screenshot-Modus"; opt_area="Bereich"; opt_full="Vollbild"; opt_window="Aktives Fenster" ;;
+  fr) title="Mode de capture"; opt_area="Zone"; opt_full="Écran complet"; opt_window="Fenêtre active" ;;
+  es) title="Modo de captura"; opt_area="Área"; opt_full="Pantalla completa"; opt_window="Ventana activa" ;;
+  it) title="Modalità screenshot"; opt_area="Area"; opt_full="Schermo intero"; opt_window="Finestra attiva" ;;
+  ru) title="Режим снимка экрана"; opt_area="Область"; opt_full="Весь экран"; opt_window="Активное окно" ;;
+  zh) title="截图模式"; opt_area="区域"; opt_full="全屏"; opt_window="活动窗口" ;;
+  *)  title="Screenshot mode"; opt_area="Area"; opt_full="Full screen"; opt_window="Active window" ;;
+esac
+
+choice=$(kdialog --menu "$title" \
+  area "$opt_area" \
+  full "$opt_full" \
+  window "$opt_window") || exit 0
+
+case $choice in
+  area)
+    spectacle -r -b -c
+    if command -v xclip &>/dev/null; then
+      xclip -selection clipboard -t image/png -o > "$outfile" 2>/dev/null
+    elif command -v xsel &>/dev/null; then
+      xsel --clipboard -t image/png -o > "$outfile" 2>/dev/null
+    fi
+    ;;
+  full)
+    spectacle -f -b -o "$outfile"
+    ;;
+  window)
+    spectacle -a -b -o "$outfile"
+    ;;
+esac
+
+if [ -s "$outfile" ]; then
+  case $lang in
+    pl) kdialog --msgbox "✅ Zrzut ekranu zapisany:\n$outfile" ;;
+    de) kdialog --msgbox "✅ Screenshot gespeichert:\n$outfile" ;;
+    fr) kdialog --msgbox "✅ Capture enregistrée :\n$outfile" ;;
+    es) kdialog --msgbox "✅ Captura guardada:\n$outfile" ;;
+    it) kdialog --msgbox "✅ Screenshot salvato:\n$outfile" ;;
+    ru) kdialog --msgbox "✅ Скриншот сохранён:\n$outfile" ;;
+    zh) kdialog --msgbox "✅ 截图已保存:\n$outfile" ;;
+    *)  kdialog --msgbox "✅ Screenshot saved:\n$outfile" ;;
+  esac
+else
+  case $lang in
+    pl) kdialog --error "❌ Nie udało się wykonać zrzutu" ;;
+    de) kdialog --error "❌ Screenshot fehlgeschlagen" ;;
+    fr) kdialog --error "❌ Capture échouée" ;;
+    es) kdialog --error "❌ Error al tomar captura" ;;
+    it) kdialog --error "❌ Acquisizione fallita" ;;
+    ru) kdialog --error "❌ Ошибка скриншота" ;;
+    zh) kdialog --error "❌ 截图失败" ;;
+    *)  kdialog --error "❌ Screenshot failed" ;;
+  esac
+fi
+EOF2
+
+  chmod +x "$SERVICES/Take-Screenshot.desktop" "$SCRIPTS"/paste-screenshot.sh
+  say "✅ Zainstalowano narzędzie Take-Screenshot" \
+      "✅ Screenshot-Tool installiert" \
+      "✅ Outil Capture installé" \
+      "✅ Herramienta Captura instalada" \
+      "✅ Strumento Screenshot installato" \
+      "✅ Инструмент Скриншотов установлен" \
+      "✅ 已安装截图工具"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Take-Screenshot.desktop" "$SCRIPTS"/paste-screenshot.sh
+  say "🗑 Usunięto narzędzie Take-Screenshot" \
+      "🗑 Screenshot-Tool entfernt" \
+      "🗑 Outil Capture supprimé" \
+      "🗑 Herramienta Captura eliminada" \
+      "🗑 Strumento Screenshot rimosso" \
+      "🗑 Инструмент Скриншотов удалён" \
+      "🗑 已删除截图工具"
+}
+
+# ==== MENU INSTALL/REMOVE ====
+say "🐬 Instalator Screenshot  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Screenshot Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Capture  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Captura  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Screenshot  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Скриншотов  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 截图工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" \
+         "❌ Ungültige Wahl" \
+         "❌ Choix invalide" \
+         "❌ Opción inválida" \
+         "❌ Scelta non valida" \
+         "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
