@@ -1,0 +1,210 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Multimedia Tools (ffmpeg)
+# Dependencies: ffmpeg, ffprobe, kdialog
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;; de) echo "$2" ;; fr) echo "$3" ;; es) echo "$4" ;;
+    it) echo "$5" ;; ru) echo "$6" ;; zh) echo "$7" ;; *) echo "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;; de) kdialog --msgbox "$2" ;; fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;; it) kdialog --msgbox "$5" ;; ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;; *) kdialog --msgbox "$1" ;;
+  esac
+}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;; de) kdialog --error "$2" ;; fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;; it) kdialog --error "$5" ;; ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;; *) kdialog --error "$1" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  cat > "$SERVICES/Multimedia-Tools.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=audio/mpeg;audio/flac;audio/x-wav;video/mp4;video/x-matroska;video/webm;video/x-msvideo;
+X-KDE-Submenu=Modify selected file
+X-KDE-Submenu[pl]=Modyfikuj zaznaczony plik
+X-KDE-Submenu[de]=Datei bearbeiten
+X-KDE-Submenu[fr]=Modifier le fichier
+X-KDE-Submenu[es]=Modificar archivo
+X-KDE-Submenu[it]=Modifica file
+X-KDE-Submenu[ru]=Изменить файл
+X-KDE-Submenu[zh_CN]=修改文件
+Actions=Convert;Resize
+Icon=folder-video-symbolic
+
+[Desktop Action Convert]
+Name=Convert
+Name[pl]=Konwertuj
+Name[de]=Konvertieren
+Name[fr]=Convertir
+Name[es]=Convertir
+Name[it]=Converti
+Name[ru]=Конвертировать
+Name[zh_CN]=转换
+Exec=$SCRIPTS/convert-ffmpeg.sh %F
+Icon=media-optical
+
+[Desktop Action Resize]
+Name=Resize (MB)
+Name[pl]=Zmiana rozmiaru (MB)
+Name[de]=Größe ändern (MB)
+Name[fr]=Redimensionner (Mo)
+Name[es]=Redimensionar (MB)
+Name[it]=Ridimensiona (MB)
+Name[ru]=Изменить размер (МБ)
+Name[zh_CN]=调整大小 (MB)
+Exec=$SCRIPTS/resize-ffmpeg.sh %F
+Icon=transform-scale
+EOF
+
+  # --- Skrypt konwersji ---
+  cat > "$SCRIPTS/convert-ffmpeg.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+if ! command -v ffmpeg &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak ffmpeg" ;;
+    de) kdialog --error "❌ ffmpeg fehlt" ;;
+    fr) kdialog --error "❌ ffmpeg est manquant" ;;
+    es) kdialog --error "❌ Falta ffmpeg" ;;
+    it) kdialog --error "❌ ffmpeg mancante" ;;
+    ru) kdialog --error "❌ ffmpeg отсутствует" ;;
+    zh) kdialog --error "❌ 缺少 ffmpeg" ;;
+  esac
+  exit 1
+fi
+
+cat=$(kdialog --menu "Kategorie" audio "Audio" video "Video") || exit 0
+if [ "$cat" = audio ]; then
+  fmt=$(kdialog --menu "Audio" mp3 "MP3" wav "WAV" flac "FLAC") || exit 0
+else
+  fmt=$(kdialog --menu "Video" mp4 "MP4" mov "MOV" webm "WebM" gif "GIF") || exit 0
+fi
+
+for f in "$@"; do
+  b="${f%.*}"
+  case $fmt in
+    mp3) ffmpeg -y -i "$f" -q:a 0 -map a "${b}_conv.mp3";;
+    wav) ffmpeg -y -i "$f" -acodec pcm_s16le -ar 44100 -ac 2 "${b}_conv.wav";;
+    flac) ffmpeg -y -i "$f" -c:a flac "${b}_conv.flac";;
+    mp4) ffmpeg -y -i "$f" -c:v libx264 -c:a aac "${b}_conv.mp4";;
+    mov) ffmpeg -y -i "$f" -c:v libx264 -c:a aac -movflags +faststart "${b}_conv.mov";;
+    webm) ffmpeg -y -i "$f" -c:v libvpx-vp9 -b:v 2M -c:a libopus "${b}_conv.webm";;
+    gif) ffmpeg -y -i "$f" -vf "fps=15,scale=640:-1" "${b}_conv.gif";;
+  esac
+done
+
+case $lang in
+  pl) kdialog --msgbox "✅ Konwersja zakończona ($fmt)" ;;
+  de) kdialog --msgbox "✅ Konvertierung abgeschlossen ($fmt)" ;;
+  fr) kdialog --msgbox "✅ Conversion terminée ($fmt)" ;;
+  es) kdialog --msgbox "✅ Conversión completa ($fmt)" ;;
+  it) kdialog --msgbox "✅ Conversione completata ($fmt)" ;;
+  ru) kdialog --msgbox "✅ Конверсия завершена ($fmt)" ;;
+  zh) kdialog --msgbox "✅ 转换完成 ($fmt)" ;;
+esac
+EOF2
+
+  # --- Skrypt resize ---
+  cat > "$SCRIPTS/resize-ffmpeg.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+if ! command -v ffmpeg &>/dev/null || ! command -v ffprobe &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak ffmpeg/ffprobe" ;;
+    de) kdialog --error "❌ ffmpeg/ffprobe fehlt" ;;
+    fr) kdialog --error "❌ ffmpeg/ffprobe est manquant" ;;
+    es) kdialog --error "❌ Falta ffmpeg/ffprobe" ;;
+    it) kdialog --error "❌ ffmpeg/ffprobe mancante" ;;
+    ru) kdialog --error "❌ ffmpeg/ffprobe отсутствует" ;;
+    zh) kdialog --error "❌ 缺少 ffmpeg/ffprobe" ;;
+  esac
+  exit 1
+fi
+
+targetMB=$(kdialog --inputbox "Docelowy rozmiar (MB)" "20") || exit 0
+
+for f in "$@"; do
+  b="${f%.*}"; ext="${f##*.}"
+  dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f" | cut -d. -f1)
+  bitrate=$(( targetMB * 8192 / dur ))
+  ffmpeg -y -i "$f" -b:v ${bitrate}k -c:v libx264 -c:a aac -b:a 128k "${b}_resize.${ext}"
+done
+
+case $lang in
+  pl) kdialog --msgbox "✅ Zmniejszono do ~${targetMB} MB" ;;
+  de) kdialog --msgbox "✅ Reduziert auf ~${targetMB} MB" ;;
+  fr) kdialog --msgbox "✅ Réduit à ~${targetMB} Mo" ;;
+  es) kdialog --msgbox "✅ Reducido a ~${targetMB} MB" ;;
+  it) kdialog --msgbox "✅ Ridotto a ~${targetMB} MB" ;;
+  ru) kdialog --msgbox "✅ Уменьшено до ~${targetMB} MB" ;;
+  zh) kdialog --msgbox "✅ 已减小到 ~${targetMB} MB" ;;
+esac
+EOF2
+
+  chmod +x "$SERVICES/Multimedia-Tools.desktop" "$SCRIPTS"/convert-ffmpeg.sh "$SCRIPTS"/resize-ffmpeg.sh
+  say "✅ Zainstalowano narzędzia Multimedia" \
+      "✅ Multimedia-Tools installiert" \
+      "✅ Outils multimédia installés" \
+      "✅ Herramientas multimedia instaladas" \
+      "✅ Strumenti multimediali installati" \
+      "✅ Мультимедиа инструменты установлены" \
+      "✅ 已安装多媒体工具"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Multimedia-Tools.desktop" "$SCRIPTS"/convert-ffmpeg.sh "$SCRIPTS"/resize-ffmpeg.sh
+  say "🗑 Usunięto narzędzia Multimedia" \
+      "🗑 Multimedia-Tools entfernt" \
+      "🗑 Outils multimédia supprimés" \
+      "🗑 Herramientas multimedia eliminadas" \
+      "🗑 Strumenti multimediali rimossi" \
+      "🗑 Мультимедиа инструменты удалены" \
+      "🗑 已删除多媒体工具"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" "❌ Ungültige Wahl" "❌ Choix invalide" \
+         "❌ Opción inválida" "❌ Scelta non valida" "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
