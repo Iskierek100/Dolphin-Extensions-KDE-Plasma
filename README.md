@@ -34,13 +34,12 @@ To uninstall: rerun the script → choose option `2 Uninstall`.
 | Module | Actions | Dependencies |
 |--------|---------|--------------|
 | **[Documents Tools](./Documents-tools-terminal_paste_code.txt)** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
-| **[Images Tools](./Images-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)`, `Optimize`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
+| **[Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)`, `Optimize`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
 | **[OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
 | **[Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
 | **[Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip`/`xsel`, `konsole` *(optional)*, `kdialog` |
-| **[Screenshot Tools](./Screenshot-tools-terminal_paste_code.txt)** | **Modify:** Optimize PNG/JPG, Convert.<br>**Take Screenshot:** Save new image via Spectacle | `spectacle`, `xclip`/`xsel`, `optipng`, `jpegoptim`, `imagemagick`, `kdialog` |
-
----
+| **[Screenshot Modify Tools](./Screenshot-modify-tools-terminal_paste_code.txt)** | **Modify existing screenshots/images:** Optimize PNG/JPG, Convert formats | `imagemagick`, `optipng`, `jpegoptim`, `kdialog` |
+| **[Take Screenshot Tools](./Take-screenshot-terminal_paste_code.txt)** | **Take screenshot & save into folder:** Spectacle (Area / Full / Window) | `spectacle`, `xclip`/`xsel`, `kdialog` |
 
 ## 📦 Dependencies
 
@@ -70,18 +69,18 @@ sudo zypper install ffmpeg ImageMagick optipng jpegoptim \
 tesseract poppler-tools yt-dlp spectacle xclip
 ```
 
-## 📂 Modules in Detail
+## 📂 Modules Overview
 
 ### 📑 [Documents Tools](./Documents-tools-terminal_paste_code.txt)
-- **PDF → TXT**: extract text with `pdftotext`.  
-- **PDF → PNG**: render page ranges to images (`pdftoppm`).  
+- **PDF → TXT**: Extract text using `pdftotext`.  
+- **PDF → PNG**: Render selected page ranges into images using `pdftoppm`.  
 
-**Usage:** Right‑click a PDF → *Modify selected file* → select action.  
+**Usage:** Right‑click a PDF → *Modify selected file* → choose desired action.  
 
 ---
 
-### 🖼 [Images Tools](./Images-tools-terminal_paste_code.txt)
-- **Resize % / px**: scale proportionally or to fixed dimensions (ImageMagick).  
+### 🖼 [Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)
+- **Resize % / px**: Scale images proportionally or to fixed dimensions (ImageMagick).  
 - **Optimize**:  
   - PNG → `optipng` (lossless)  
   - JPG → `jpegoptim` (quality ≈85%)  
@@ -92,42 +91,46 @@ tesseract poppler-tools yt-dlp spectacle xclip
 ---
 
 ### 🔤 [OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)
-- **OCR → TXT**: recognizes text in PNG/JPG/TIFF using `tesseract`.  
-- Results saved as `*_ocr.txt`.  
+- **OCR → TXT**: Recognize text in image files (PNG/JPG/TIFF) using `tesseract`.  
+- Saves result as `*_ocr.txt`.  
 
 **Usage:** Right‑click an image → *Modify selected file* → OCR to TXT.  
 
 ---
 
 ### 🎵🎬 [Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)
-- **Convert**: transform audio/video into MP3, WAV, FLAC, MP4, MOV, WebM, GIF.  
-- **Resize (MB)**: shrink multimedia file to specified size, recalculating bitrate dynamically.  
+- **Convert**: Transform audio/video into MP3, WAV, FLAC, MP4, MOV, WebM, GIF.  
+- **Resize (MB)**: Shrink file size to a user‑chosen MB value, using ffmpeg/ffprobe.  
 
-**Usage:** Right‑click a media file → *Modify selected file* → Convert/Resize.  
+**Usage:** Right‑click a media file → *Modify selected file*.  
 
 ---
 
 ### 📥 [Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)
 - Adds context entry **“Download video (paste URL)”** available on folders.  
 - Reads URL from clipboard or prompt.  
-- Lets you choose: MP3 (audio) or MP4 (video, quality options).  
-- Downloads via `yt-dlp` into chosen folder.  
+- Lets you choose MP3 (audio) or MP4 (video with quality).  
+- Downloads via `yt-dlp` directly into the folder.  
 
 **Usage:** Right‑click empty space in a folder → Download video.  
 
 ---
 
-### 📸 [Screenshot Tools](./Screenshot-tools-terminal_paste_code.txt)
-1. **Modify Screenshot/Images**  
-   - Optimize (optipng/jpegoptim)  
-   - Convert format (JPG/PNG/WebP/TIFF/BMP/GIF)  
+### 🖼 [Screenshot Modify Tools](./Screenshot-modify-tools-terminal_paste_code.txt)
+- **Optimize**: compress PNG (optipng) or JPG (jpegoptim).  
+- **Convert**: convert screenshots/images between JPG, PNG, WebP, TIFF, BMP, GIF.  
 
-2. **Take Screenshot & Save Here**  
-   - Context action in empty folder space.  
-   - Runs **Spectacle**: Area / Full Screen / Active Window.  
-   - Saves screenshot PNG into this folder automatically.  
+**Usage:** Right‑click existing image (e.g. a screenshot) → *Modify selected file*.  
 
 ---
+
+### 📸 [Take Screenshot Tools](./Take-screenshot-terminal_paste_code.txt)
+- **Take Screenshot & Save Here**:  
+  - Appears when right‑clicking **empty space** in a folder.  
+  - Launches **Spectacle** in chosen mode: Area / Full Screen / Active Window.  
+  - Automatically saves PNG into the folder with timestamp name.  
+
+**Usage:** Right‑click empty folder space → *Take screenshot and paste here*.  
 
 ## 🖱️ Usage Summary
 
