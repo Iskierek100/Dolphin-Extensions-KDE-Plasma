@@ -1,0 +1,254 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Documents Tools (PDF utils)
+# Dependencies: poppler-utils (pdftotext, pdftoppm), kdialog
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;;
+    de) echo "$2" ;;
+    fr) echo "$3" ;;
+    es) echo "$4" ;;
+    it) echo "$5" ;;
+    ru) echo "$6" ;;
+    zh) echo "$7" ;;
+    *)  echo "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;;
+    de) kdialog --msgbox "$2" ;;
+    fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;;
+    it) kdialog --msgbox "$5" ;;
+    ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;;
+    *)  kdialog --msgbox "$1" ;;
+  esac
+}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;;
+    de) kdialog --error "$2" ;;
+    fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;;
+    it) kdialog --error "$5" ;;
+    ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;;
+    *)  kdialog --error "$1" ;;
+  esac
+}
+
+ask_input() {
+  local default="$2"
+  case $lang in
+    pl) kdialog --inputbox "$1" "$default" ;;
+    de) kdialog --inputbox "$3" "$default" ;;
+    fr) kdialog --inputbox "$4" "$default" ;;
+    es) kdialog --inputbox "$5" "$default" ;;
+    it) kdialog --inputbox "$6" "$default" ;;
+    ru) kdialog --inputbox "$7" "$default" ;;
+    zh) kdialog --inputbox "$8" "$default" ;;
+    *)  kdialog --inputbox "$1" "$default" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  cat > "$SERVICES/Documents-Tools.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/pdf;
+X-KDE-Submenu=Modify selected file
+X-KDE-Submenu[pl]=Modyfikuj zaznaczony plik
+X-KDE-Submenu[de]=Datei bearbeiten
+X-KDE-Submenu[fr]=Modifier le fichier
+X-KDE-Submenu[es]=Modificar archivo
+X-KDE-Submenu[it]=Modifica file
+X-KDE-Submenu[ru]=Изменить файл
+X-KDE-Submenu[zh_CN]=修改文件
+Actions=PdfToTxt;PdfToPng
+Icon=application-pdf
+
+[Desktop Action PdfToTxt]
+Name=PDF → TXT (text)
+Name[pl]=PDF → TXT (tekst)
+Name[de]=PDF → TXT (Text)
+Name[fr]=PDF → TXT (Texte)
+Name[es]=PDF → TXT (Texto)
+Name[it]=PDF → TXT (Testo)
+Name[ru]=PDF → TXT (Текст)
+Name[zh_CN]=PDF → TXT (文本)
+Exec=$SCRIPTS/pdf-to-txt.sh %F
+Icon=text-x-generic
+
+[Desktop Action PdfToPng]
+Name=PDF → Images (PNG)
+Name[pl]=PDF → Obrazy (PNG)
+Name[de]=PDF → Bilder (PNG)
+Name[fr]=PDF → Images (PNG)
+Name[es]=PDF → Imágenes (PNG)
+Name[it]=PDF → Immagini (PNG)
+Name[ru]=PDF → Изображения (PNG)
+Name[zh_CN]=PDF → 图像 (PNG)
+Exec=$SCRIPTS/pdf-to-png.sh %F
+Icon=image-x-generic
+EOF
+
+  # --- Skrypt PDF → TXT ---
+  cat > "$SCRIPTS/pdf-to-txt.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "❌ Brak pdftotext (sudo apt install poppler-utils)" ;;
+    de) kdialog --error "❌ pdftotext fehlt (sudo apt install poppler-utils)" ;;
+    fr) kdialog --error "❌ pdftotext est manquant (sudo apt install poppler-utils)" ;;
+    es) kdialog --error "❌ Falta pdftotext (sudo apt install poppler-utils)" ;;
+    it) kdialog --error "❌ pdftotext mancante (sudo apt install poppler-utils)" ;;
+    ru) kdialog --error "❌ pdftotext отсутствует (sudo apt install poppler-utils)" ;;
+    zh) kdialog --error "❌ 缺少 pdftotext (sudo apt install poppler-utils)" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "✅ PDF → TXT zakończone" ;;
+    de) kdialog --msgbox "✅ PDF → TXT abgeschlossen" ;;
+    fr) kdialog --msgbox "✅ PDF → TXT terminé" ;;
+    es) kdialog --msgbox "✅ PDF → TXT completado" ;;
+    it) kdialog --msgbox "✅ PDF → TXT completato" ;;
+    ru) kdialog --msgbox "✅ PDF → TXT завершено" ;;
+    zh) kdialog --msgbox "✅ PDF → TXT 完成" ;;
+  esac
+}
+
+if ! command -v pdftotext &>/dev/null; then
+  ask_error; exit 1
+fi
+
+for f in "$@"; do
+  b="${f%.*}"
+  pdftotext "$f" "${b}.txt"
+done
+
+ask_msg
+EOF2
+
+  # --- Skrypt PDF → PNG ---
+  cat > "$SCRIPTS/pdf-to-png.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "❌ Brak pdftoppm (sudo apt install poppler-utils)" ;;
+    de) kdialog --error "❌ pdftoppm fehlt (sudo apt install poppler-utils)" ;;
+    fr) kdialog --error "❌ pdftoppm est manquant (sudo apt install poppler-utils)" ;;
+    es) kdialog --error "❌ Falta pdftoppm (sudo apt install poppler-utils)" ;;
+    it) kdialog --error "❌ pdftoppm mancante (sudo apt install poppler-utils)" ;;
+    ru) kdialog --error "❌ pdftoppm отсутствует (sudo apt install poppler-utils)" ;;
+    zh) kdialog --error "❌ 缺少 pdftoppm (sudo apt install poppler-utils)" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "✅ PDF → PNG zakończone (wynik w *_images)" ;;
+    de) kdialog --msgbox "✅ PDF → PNG abgeschlossen (Ausgabe in *_images)" ;;
+    fr) kdialog --msgbox "✅ PDF → PNG terminé (résultats dans *_images)" ;;
+    es) kdialog --msgbox "✅ PDF → PNG completado (salida en *_images)" ;;
+    it) kdialog --msgbox "✅ PDF → PNG completato (risultato in *_images)" ;;
+    ru) kdialog --msgbox "✅ PDF → PNG завершено (результат в *_images)" ;;
+    zh) kdialog --msgbox "✅ PDF → PNG 完成 (输出在 *_images)" ;;
+  esac
+}
+
+if ! command -v pdftoppm &>/dev/null; then
+  ask_error; exit 1
+fi
+
+pages=$(kdialog --inputbox "Zakres stron (np. 1-5,10,22)" "1") || exit 0
+
+for f in "$@"; do
+  b="$(basename "${f%.*}")"
+  dir="$(dirname "$f")"
+  outdir="$dir/${b}_images"
+  mkdir -p "$outdir"
+
+  IFS=',' read -ra parts <<< "$pages"
+  for p in "${parts[@]}"; do
+    if [[ "$p" =~ - ]]; then
+      from=$(echo "$p" | cut -d- -f1)
+      to=$(echo "$p" | cut -d- -f2)
+      pdftoppm -png -f "$from" -l "$to" "$f" "$outdir/page"
+    else
+      pdftoppm -png -f "$p" -l "$p" "$f" "$outdir/page"
+    fi
+  done
+done
+
+ask_msg
+EOF2
+
+  chmod +x "$SERVICES/Documents-Tools.desktop" "$SCRIPTS"/pdf-to-*.sh
+  say "✅ Zainstalowano narzędzia Dokumentów (PDF)" \
+      "✅ Dokument-Tools installiert (PDF)" \
+      "✅ Outils Documents installés (PDF)" \
+      "✅ Herramientas Documentos instaladas (PDF)" \
+      "✅ Strumenti Documenti installati (PDF)" \
+      "✅ Инструменты PDF установлены" \
+      "✅ 已安装文档工具 (PDF)"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Documents-Tools.desktop" "$SCRIPTS"/pdf-to-*.sh
+  say "🗑 Usunięto narzędzia Dokumentów (PDF)" \
+      "🗑 Dokument-Tools entfernt (PDF)" \
+      "🗑 Outils Documents supprimés (PDF)" \
+      "🗑 Herramientas Documentos eliminadas (PDF)" \
+      "🗑 Strumenti Documenti rimossi (PDF)" \
+      "🗑 Инструменты PDF удалены" \
+      "🗑 已删除文档工具 (PDF)"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" \
+         "❌ Ungültige Wahl" \
+         "❌ Choix invalide" \
+         "❌ Opción inválida" \
+         "❌ Scelta non valida" \
+         "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
