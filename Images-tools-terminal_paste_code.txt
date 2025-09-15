@@ -1,0 +1,239 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Image Tools (resize, ImageMagick)
+# Dependencies: ImageMagick (magick/convert), kdialog
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;;
+    de) echo "$2" ;;
+    fr) echo "$3" ;;
+    es) echo "$4" ;;
+    it) echo "$5" ;;
+    ru) echo "$6" ;;
+    zh) echo "$7" ;;
+    *)  echo "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;;
+    de) kdialog --msgbox "$2" ;;
+    fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;;
+    it) kdialog --msgbox "$5" ;;
+    ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;;
+    *)  kdialog --msgbox "$1" ;;
+  esac
+}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;;
+    de) kdialog --error "$2" ;;
+    fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;;
+    it) kdialog --error "$5" ;;
+    ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;;
+    *)  kdialog --error "$1" ;;
+  esac
+}
+
+ask_input() {
+  local default="$2"
+  case $lang in
+    pl) kdialog --inputbox "$1" "$default" ;;
+    de) kdialog --inputbox "$3" "$default" ;;
+    fr) kdialog --inputbox "$4" "$default" ;;
+    es) kdialog --inputbox "$5" "$default" ;;
+    it) kdialog --inputbox "$6" "$default" ;;
+    ru) kdialog --inputbox "$7" "$default" ;;
+    zh) kdialog --inputbox "$8" "$default" ;;
+    *)  kdialog --inputbox "$1" "$default" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  cat > "$SERVICES/Images-Tools.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/*
+X-KDE-Submenu=Modify selected file
+X-KDE-Submenu[pl]=Modyfikuj zaznaczony plik
+X-KDE-Submenu[de]=Datei bearbeiten
+X-KDE-Submenu[fr]=Modifier le fichier
+X-KDE-Submenu[es]=Modificar archivo
+X-KDE-Submenu[it]=Modifica file
+X-KDE-Submenu[ru]=Изменить файл
+X-KDE-Submenu[zh_CN]=修改文件
+Actions=ResizePercent;ResizePx
+Icon=image-x-generic
+
+[Desktop Action ResizePercent]
+Name=Scale (%)
+Name[pl]=Skaluj (%)
+Name[de]=Skalieren (%)
+Name[fr]=Échelle (%)
+Name[es]=Escalar (%)
+Name[it]=Scala (%)
+Name[ru]=Масштаб (%)
+Name[zh_CN]=缩放 (%)
+Exec=$SCRIPTS/image-resize-percent.sh %F
+Icon=transform-scale
+
+[Desktop Action ResizePx]
+Name=Scale (px)
+Name[pl]=Skaluj (px)
+Name[de]=Skalieren (px)
+Name[fr]=Échelle (px)
+Name[es]=Escalar (px)
+Name[it]=Scala (px)
+Name[ru]=Масштаб (px)
+Name[zh_CN]=缩放 (px)
+Exec=$SCRIPTS/image-resize-pixels.sh %F
+Icon=transform-scale
+EOF
+
+  # --- resize procentowy ---
+  cat > "$SCRIPTS/image-resize-percent.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "❌ Brak ImageMagick" ;;
+    de) kdialog --error "❌ ImageMagick fehlt" ;;
+    fr) kdialog --error "❌ ImageMagick est manquant" ;;
+    es) kdialog --error "❌ Falta ImageMagick" ;;
+    it) kdialog --error "❌ ImageMagick mancante" ;;
+    ru) kdialog --error "❌ Отсутствует ImageMagick" ;;
+    zh) kdialog --error "❌ 缺少 ImageMagick" ;;
+  esac
+}
+
+if ! command -v magick &>/dev/null && ! command -v convert &>/dev/null; then
+  ask_error; exit 1
+fi
+
+scale=$(kdialog --inputbox "Procent (%)" "100") || exit 0
+
+for f in "$@"; do
+  b="${f%.*}"; ext="${f##*.}"
+  if command -v magick &>/dev/null; then
+    magick convert "$f" -resize ${scale}% "${b}_${scale}pct.${ext}"
+  else
+    convert "$f" -resize ${scale}% "${b}_${scale}pct.${ext}"
+  fi
+done
+
+ask_msg "✅ Skala ${scale}%" \
+        "✅ Skaliert ${scale}%" \
+        "✅ Mise à l'échelle ${scale}%" \
+        "✅ Escalado ${scale}%" \
+        "✅ Scalato ${scale}%" \
+        "✅ Масштабировано ${scale}%" \
+        "✅ 已缩放 ${scale}%"
+EOF2
+
+  # --- resize w pikselach ---
+  cat > "$SCRIPTS/image-resize-pixels.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "❌ Brak ImageMagick" ;;
+    de) kdialog --error "❌ ImageMagick fehlt" ;;
+    fr) kdialog --error "❌ ImageMagick est manquant" ;;
+    es) kdialog --error "❌ Falta ImageMagick" ;;
+    it) kdialog --error "❌ ImageMagick mancante" ;;
+    ru) kdialog --error "❌ Отсутствует ImageMagick" ;;
+    zh) kdialog --error "❌ 缺少 ImageMagick" ;;
+  esac
+}
+
+if ! command -v magick &>/dev/null && ! command -v convert &>/dev/null; then
+  ask_error; exit 1
+fi
+
+dims=$(kdialog --inputbox "Rozmiar np. 800x600" "800x600") || exit 0
+
+for f in "$@"; do
+  b="${f%.*}"; ext="${f##*.}"
+  if command -v magick &>/dev/null; then
+    magick convert "$f" -resize $dims "${b}_${dims}.${ext}"
+  else
+    convert "$f" -resize $dims "${b}_${dims}.${ext}"
+  fi
+done
+
+ask_msg "✅ Rozmiar $dims" \
+        "✅ Größe $dims" \
+        "✅ Taille $dims" \
+        "✅ Tamaño $dims" \
+        "✅ Dimensioni $dims" \
+        "✅ Размер $dims" \
+        "✅ 大小 $dims"
+EOF2
+
+  chmod +x "$SERVICES/Images-Tools.desktop" "$SCRIPTS"/image-resize-*.sh
+  say "✅ Zainstalowano narzędzia Obrazy" \
+      "✅ Bild-Tools installiert" \
+      "✅ Outils Images installés" \
+      "✅ Herramientas de Imágenes instaladas" \
+      "✅ Strumenti Immagini installati" \
+      "✅ Инструменты для изображений установлены" \
+      "✅ 已安装图像工具"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Images-Tools.desktop" "$SCRIPTS"/image-resize-*.sh
+  say "🗑 Usunięto narzędzia Obrazy" \
+      "🗑 Bild-Tools entfernt" \
+      "🗑 Outils Images supprimés" \
+      "🗑 Herramientas de Imágenes eliminadas" \
+      "🗑 Strumenti Immagini rimossi" \
+      "🗑 Инструменты для изображений удалены" \
+      "🗑 已删除图像工具"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" \
+         "❌ Ungültige Wahl" \
+         "❌ Choix invalide" \
+         "❌ Opción inválida" \
+         "❌ Scelta non valida" \
+         "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
