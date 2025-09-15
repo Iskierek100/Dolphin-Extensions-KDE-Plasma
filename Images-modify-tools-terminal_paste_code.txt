@@ -1,0 +1,212 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Images Modify Tools
+# Obsługa plików obrazów (PNG/JPG):
+#   - Optimize (optymalizacja wag)
+#   - Convert (wybór formatu docelowego)
+# Dependencies: optipng, jpegoptim, imagemagick, kdialog
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;; de) echo "$2" ;; fr) echo "$3" ;; es) echo "$4" ;;
+    it) echo "$5" ;; ru) echo "$6" ;; zh) echo "$7" ;; *) echo "$1" ;;
+  esac
+}
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;; de) kdialog --msgbox "$2" ;; fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;; it) kdialog --msgbox "$5" ;; ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;; *) kdialog --msgbox "$1" ;;
+  esac
+}
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;; de) kdialog --error "$2" ;; fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;; it) kdialog --error "$5" ;; ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;; *) kdialog --error "$1" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  cat > "$SERVICES/Images-Modify-Tools.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/*;
+X-KDE-Submenu=Modify selected file
+X-KDE-Submenu[pl]=Modyfikuj zaznaczony plik
+X-KDE-Submenu[de]=Datei bearbeiten
+X-KDE-Submenu[fr]=Modifier le fichier
+X-KDE-Submenu[es]=Modificar archivo
+X-KDE-Submenu[it]=Modifica file
+X-KDE-Submenu[ru]=Изменить файл
+X-KDE-Submenu[zh_CN]=修改文件
+Actions=OptimizeImage;ConvertImage
+Icon=insert-image
+
+[Desktop Action OptimizeImage]
+Name=Optimize image
+Name[pl]=Optymalizuj obraz
+Name[de]=Bild optimieren
+Name[fr]=Optimiser image
+Name[es]=Optimizar imagen
+Name[it]=Ottimizza immagine
+Name[ru]=Оптимизировать изображение
+Name[zh_CN]=优化图像
+Exec=$SCRIPTS/image-optimize.sh %F
+Icon=document-save
+
+[Desktop Action ConvertImage]
+Name=Convert image
+Name[pl]=Konwertuj obraz
+Name[de]=Bild konvertieren
+Name[fr]=Convertir image
+Name[es]=Convertir imagen
+Name[it]=Converti immagine
+Name[ru]=Конвертировать изображение
+Name[zh_CN]=转换图像
+Exec=$SCRIPTS/image-convert.sh %F
+Icon=applications-graphics
+EOF
+
+  # --- Optimize image ---
+  cat > "$SCRIPTS/image-optimize.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+if ! command -v optipng &>/dev/null && ! command -v jpegoptim &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak optipng/jpegoptim (zainstaluj: sudo apt install optipng jpegoptim)" ;;
+    de) kdialog --error "❌ optipng/jpegoptim fehlt (installiere: sudo apt install optipng jpegoptim)" ;;
+    fr) kdialog --error "❌ optipng/jpegoptim est manquant (installez: sudo apt install optipng jpegoptim)" ;;
+    es) kdialog --error "❌ Falta optipng/jpegoptim (instalar: sudo apt install optipng jpegoptim)" ;;
+    it) kdialog --error "❌ optipng/jpegoptim mancanti (installa: sudo apt install optipng jpegoptim)" ;;
+    ru) kdialog --error "❌ optipng/jpegoptim отсутствует (установите: sudo apt install optipng jpegoptim)" ;;
+    zh) kdialog --error "❌ 缺少 optipng/jpegoptim (安装: sudo apt install optipng jpegoptim)" ;;
+  esac
+  exit 1
+fi
+
+for f in "$@"; do
+  ext="${f##*.}"
+  if [[ "$ext" =~ png|PNG ]]; then
+    optipng -o7 "$f"
+  elif [[ "$ext" =~ jpg|jpeg|JPG|JPEG ]]; then
+    jpegoptim --max=85 "$f"
+  fi
+done
+
+case $lang in
+  pl) kdialog --msgbox "✅ Optymalizacja zakończona" ;;
+  de) kdialog --msgbox "✅ Optimierung abgeschlossen" ;;
+  fr) kdialog --msgbox "✅ Optimisation terminée" ;;
+  es) kdialog --msgbox "✅ Optimización completa" ;;
+  it) kdialog --msgbox "✅ Ottimizzazione completata" ;;
+  ru) kdialog --msgbox "✅ Оптимизация завершена" ;;
+  zh) kdialog --msgbox "✅ 优化完成" ;;
+esac
+EOF2
+
+  # --- Convert image ---
+  cat > "$SCRIPTS/image-convert.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+if ! command -v magick &>/dev/null && ! command -v convert &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak ImageMagick (sudo apt install imagemagick)" ;;
+    de) kdialog --error "❌ ImageMagick fehlt (sudo apt install imagemagick)" ;;
+    fr) kdialog --error "❌ ImageMagick est manquant (sudo apt install imagemagick)" ;;
+    es) kdialog --error "❌ Falta ImageMagick (sudo apt install imagemagick)" ;;
+    it) kdialog --error "❌ ImageMagick mancante (sudo apt install imagemagick)" ;;
+    ru) kdialog --error "❌ Отсутствует ImageMagick (sudo apt install imagemagick)" ;;
+    zh) kdialog --error "❌ 缺少 ImageMagick (安装: sudo apt install imagemagick)" ;;
+  esac
+  exit 1
+fi
+
+fmt=$(kdialog --menu "Wybierz format docelowy:" \
+  jpg "JPEG" \
+  png "PNG" \
+  webp "WebP" \
+  tiff "TIFF" \
+  bmp "BMP" \
+  gif "GIF") || exit 0
+
+for f in "$@"; do
+  b="${f%.*}"
+  if command -v magick &>/dev/null; then
+    magick "$f" "$b.$fmt"
+  else
+    convert "$f" "$b.$fmt"
+  fi
+done
+
+case $lang in
+  pl) kdialog --msgbox "✅ Pliki skonwertowane do: $fmt" ;;
+  de) kdialog --msgbox "✅ Dateien konvertiert nach: $fmt" ;;
+  fr) kdialog --msgbox "✅ Fichiers convertis en : $fmt" ;;
+  es) kdialog --msgbox "✅ Archivos convertidos a: $fmt" ;;
+  it) kdialog --msgbox "✅ File convertiti in: $fmt" ;;
+  ru) kdialog --msgbox "✅ Файлы конвертированы в: $fmt" ;;
+  zh) kdialog --msgbox "✅ 文件已转换为: $fmt" ;;
+esac
+EOF2
+
+  chmod +x "$SERVICES/Images-Modify-Tools.desktop" "$SCRIPTS"/image-*.sh
+  say "✅ Zainstalowano narzędzia do obrazów (Optimize & Convert)" \
+      "✅ Bild-Tools installiert (Optimieren & Konvertieren)" \
+      "✅ Outils Image installés (Optimiser & Convertir)" \
+      "✅ Herramientas Imagen instaladas (Optimizar & Convertir)" \
+      "✅ Strumenti Immagine installati (Ottimizza & Converti)" \
+      "✅ Инструменты изображений установлены (Оптимизация и Конверсия)" \
+      "✅ 已安装图像工具 (优化与转换)"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Images-Modify-Tools.desktop" "$SCRIPTS"/image-*.sh
+  say "🗑 Usunięto narzędzia obrazów (Optimize & Convert)" \
+      "🗑 Bild-Tools entfernt (Optimieren & Konvertieren)" \
+      "🗑 Outils Image supprimés (Optimiser & Convertir)" \
+      "🗑 Herramientas Imagen eliminadas (Optimizar & Convertir)" \
+      "🗑 Strumenti Immagine rimossi (Ottimizza & Converti)" \
+      "🗑 Инструменты изображений удалены (Оптимизация и Конверсия)" \
+      "🗑 已删除图像工具 (优化与转换)"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" \
+         "❌ Ungültige Wahl" \
+         "❌ Choix invalide" \
+         "❌ Opción inválida" \
+         "❌ Scelta non valida" \
+         "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
