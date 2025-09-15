@@ -16,15 +16,35 @@ All modules are lightweight **bash scripts** tied to `.desktop` entries in `~/.l
 
 ## ⚙️ Installation & Usage
 
-All modules are distributed as `.txt` files containing ready‑to‑run bash code.  
-
-1. Open a `.txt` file → copy all.  
-2. Paste into a terminal → choose `1 Install`.  
-3. Restart or refresh Dolphin → the ServiceMenu appears in the context menu.  
-
-To uninstall: run the same script again → choose `2 Uninstall`.  
+- Copy any `.txt` file → paste in terminal.
+- Hit enter and wait few secounds.
+- Pick `1 Install`.  
+- Dolphin → right‑click menu shows new entries.  
+- To remove → rerun script → pick `2 Uninstall`.  
 
 No root access required — everything is installed into the user’s home (`~/.local/share/`).
+
+---
+
+# 📋 Quick Overview Table (Propozycja do README.md)
+
+| Module | Actions | Dependencies |
+|--------|---------|--------------|
+| **Documents Tools** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
+| **Images Tools** | `Resize (%)`, `Resize (px)`, `Optimize image`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
+| **OCR Tools** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
+| **Multimedia Tools** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
+| **Download Video Tools** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip/xsel`, `konsole`, `kdialog` |
+| **Screenshot Tools** | **Modify:** Optimize PNG/JPG, Convert formats. <br> **Take Screenshot:** Save new image via Spectacle | `spectacle`, `xclip/xsel`, `optipng`, `jpegoptim`, `imagemagick`, `kdialog` |
+
+---
+
+## 🚀 Example Installation Flow
+
+- Copy any `.txt` file → paste in terminal.  
+- Pick `1 Install`.  
+- Dolphin → right‑click menu shows new entries.  
+- To remove → rerun script → pick `2 Uninstall`.  
 
 ---
 
