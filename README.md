@@ -1,16 +1,3 @@
-Świetnie 🙌 To zrobię Ci **finalny draft `README.md`** do wrzucenia w repo na GitHubie, w pełnym **ENGLISH** (bo to idzie na forum KDE).  
-Uwzględniam:
-
-- ✅ Twoją obecną treść,  
-- ✅ Poprawki językowe (typo `secounds` → `seconds`, dodanie że `konsole` = optional),  
-- ✅ Spójne nagłówki i opisy,  
-- ✅ **Bezpośrednie linki** do Twoich `.txt` installerów w repo (bazując na strukturze `main` z linka którego podałeś).  
-
----
-
-# 📄 Final `README.md`
-
-```markdown
 # 🐬 Dolphin ServiceMenu Tools – KDE Addons Pack
 
 This is a collection of handy **ServiceMenu addons** for the **Dolphin file manager** (KDE Plasma).  
@@ -63,7 +50,6 @@ Each module uses common Linux packages. Please install them first:
 ```bash
 sudo apt install ffmpeg ffprobe imagemagick optipng jpegoptim \
 tesseract-ocr poppler-utils yt-dlp spectacle xclip
-```
 
 ### Arch Linux / Manjaro
 ```bash
