@@ -1,0 +1,199 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: OCR to TXT
+# Dependencies: tesseract, kdialog
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;;
+    de) echo "$2" ;;
+    fr) echo "$3" ;;
+    es) echo "$4" ;;
+    it) echo "$5" ;;
+    ru) echo "$6" ;;
+    zh) echo "$7" ;;
+    *)  echo "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;;
+    de) kdialog --msgbox "$2" ;;
+    fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;;
+    it) kdialog --msgbox "$5" ;;
+    ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;;
+    *)  kdialog --msgbox "$1" ;;
+  esac
+}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;;
+    de) kdialog --error "$2" ;;
+    fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;;
+    it) kdialog --error "$5" ;;
+    ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;;
+    *)  kdialog --error "$1" ;;
+  esac
+}
+
+ask_input() {
+  local default="$2"
+  case $lang in
+    pl) kdialog --inputbox "$1" "$default" ;;
+    de) kdialog --inputbox "$3" "$default" ;;
+    fr) kdialog --inputbox "$4" "$default" ;;
+    es) kdialog --inputbox "$5" "$default" ;;
+    it) kdialog --inputbox "$6" "$default" ;;
+    ru) kdialog --inputbox "$7" "$default" ;;
+    zh) kdialog --inputbox "$8" "$default" ;;
+    *)  kdialog --inputbox "$1" "$default" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  cat > "$SERVICES/OCR-to-TXT.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/*;
+X-KDE-Submenu=Modify selected file
+X-KDE-Submenu[pl]=Modyfikuj zaznaczony plik
+X-KDE-Submenu[de]=Datei bearbeiten
+X-KDE-Submenu[fr]=Modifier le fichier
+X-KDE-Submenu[es]=Modificar archivo
+X-KDE-Submenu[it]=Modifica file
+X-KDE-Submenu[ru]=Изменить файл
+X-KDE-Submenu[zh_CN]=修改文件
+Actions=OCRText
+Icon=accessories-text-editor
+
+[Desktop Action OCRText]
+Name=OCR to TXT
+Name[pl]=OCR do TXT
+Name[de]=OCR nach TXT
+Name[fr]=OCR vers TXT
+Name[es]=OCR a TXT
+Name[it]=OCR in TXT
+Name[ru]=OCR в TXT
+Name[zh_CN]=OCR 到 TXT
+Exec=$SCRIPTS/ocr-to-txt.sh %F
+Icon=accessories-text-editor
+EOF
+
+  cat > "$SCRIPTS/ocr-to-txt.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+# ponownie definicje mini-funkcji w podskrypcie
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;;
+    de) kdialog --error "$2" ;;
+    fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;;
+    it) kdialog --error "$5" ;;
+    ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;;
+    *)  kdialog --error "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;;
+    de) kdialog --msgbox "$2" ;;
+    fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;;
+    it) kdialog --msgbox "$5" ;;
+    ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;;
+    *)  kdialog --msgbox "$1" ;;
+  esac
+}
+
+# sprawdz zależności
+if ! command -v tesseract &>/dev/null; then
+  ask_error "❌ Brak tesseract" \
+            "❌ tesseract fehlt" \
+            "❌ tesseract est manquant" \
+            "❌ Falta tesseract" \
+            "❌ tesseract mancante" \
+            "❌ tesseract отсутствует" \
+            "❌ 缺少 tesseract"
+  exit 1
+fi
+
+lang_code=$(kdialog --inputbox "Język OCR (np. eng, pol…)" "eng")
+[ -z "$lang_code" ] && exit 0
+
+for f in "$@"; do
+  b="${f%.*}"
+  tesseract "$f" "${b}_ocr" -l "$lang_code"
+done
+
+ask_msg "✅ OCR zakończony. Utworzono pliki *_ocr.txt" \
+        "✅ OCR abgeschlossen. Dateien *_ocr.txt erstellt" \
+        "✅ OCR terminé. Fichiers *_ocr.txt créés" \
+        "✅ OCR completo. Archivos *_ocr.txt creados" \
+        "✅ OCR completato. File *_ocr.txt creati" \
+        "✅ OCR завершён. Файлы *_ocr.txt созданы" \
+        "✅ OCR 完成。已创建 *_ocr.txt 文件"
+EOF2
+
+  chmod +x "$SERVICES/OCR-to-TXT.desktop" "$SCRIPTS/ocr-to-txt.sh"
+  say "✅ Zainstalowano OCR do TXT" \
+      "✅ OCR to TXT installiert" \
+      "✅ OCR vers TXT installé" \
+      "✅ OCR a TXT instalado" \
+      "✅ OCR in TXT installato" \
+      "✅ OCR в TXT установлен" \
+      "✅ 已安装 OCR 到 TXT"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/OCR-to-TXT.desktop" "$SCRIPTS/ocr-to-txt.sh"
+  say "🗑 Usunięto OCR do TXT" \
+      "🗑 OCR to TXT deinstalliert" \
+      "🗑 OCR vers TXT désinstallé" \
+      "🗑 OCR a TXT desinstalado" \
+      "🗑 OCR in TXT rimosso" \
+      "🗑 OCR в TXT удалён" \
+      "🗑 已删除 OCR 到 TXT"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" "❌ Ungültige Wahl" "❌ Choix invalide" "❌ Elección inválida" "❌ Scelta non valida" "❌ Неверный выбор" "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
