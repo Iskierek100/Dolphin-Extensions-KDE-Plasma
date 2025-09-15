@@ -26,7 +26,7 @@ No root access required — everything is installed into the user’s home (`~/.
 
 ---
 
-# 📋 Quick Overview Table (Propozycja do README.md)
+# 📋 Quick Overview Table
 
 | Module | Actions | Dependencies |
 |--------|---------|--------------|
@@ -36,15 +36,6 @@ No root access required — everything is installed into the user’s home (`~/.
 | **Multimedia Tools** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
 | **Download Video Tools** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip/xsel`, `konsole`, `kdialog` |
 | **Screenshot Tools** | **Modify:** Optimize PNG/JPG, Convert formats. <br> **Take Screenshot:** Save new image via Spectacle | `spectacle`, `xclip/xsel`, `optipng`, `jpegoptim`, `imagemagick`, `kdialog` |
-
----
-
-## 🚀 Example Installation Flow
-
-- Copy any `.txt` file → paste in terminal.  
-- Pick `1 Install`.  
-- Dolphin → right‑click menu shows new entries.  
-- To remove → rerun script → pick `2 Uninstall`.  
 
 ---
 
