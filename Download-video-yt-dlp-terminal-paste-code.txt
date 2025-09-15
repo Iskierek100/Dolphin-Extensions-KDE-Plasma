@@ -1,0 +1,189 @@
+bash <(cat <<'EOS'
+#!/usr/bin/env bash
+# ==============================================
+# Dolphin ServiceMenu: Download video/audio via yt-dlp
+# Dependencies: yt-dlp, kdialog, xclip/xsel
+# ==============================================
+
+BASE="$HOME/.local/share"
+SERVICES="$BASE/kio/servicemenus"
+SCRIPTS="$BASE/dolphin-scripts"
+
+# === BLOK LOKALIZACJI ===
+lang=${LANG:0:2}
+
+say() {
+  case $lang in
+    pl) echo "$1" ;; de) echo "$2" ;; fr) echo "$3" ;; es) echo "$4" ;;
+    it) echo "$5" ;; ru) echo "$6" ;; zh) echo "$7" ;; *) echo "$1" ;;
+  esac
+}
+
+ask_msg() {
+  case $lang in
+    pl) kdialog --msgbox "$1" ;; de) kdialog --msgbox "$2" ;; fr) kdialog --msgbox "$3" ;;
+    es) kdialog --msgbox "$4" ;; it) kdialog --msgbox "$5" ;; ru) kdialog --msgbox "$6" ;;
+    zh) kdialog --msgbox "$7" ;; *) kdialog --msgbox "$1" ;;
+  esac
+}
+
+ask_error() {
+  case $lang in
+    pl) kdialog --error "$1" ;; de) kdialog --error "$2" ;; fr) kdialog --error "$3" ;;
+    es) kdialog --error "$4" ;; it) kdialog --error "$5" ;; ru) kdialog --error "$6" ;;
+    zh) kdialog --error "$7" ;; *) kdialog --error "$1" ;;
+  esac
+}
+
+install_all() {
+  mkdir -p "$SERVICES" "$SCRIPTS"
+
+  # === Desktop Entry (.desktop) ===
+  cat > "$SERVICES/Download-Video.desktop" <<EOF
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=PasteVideoURL
+Icon=download
+
+[Desktop Action PasteVideoURL]
+Name=Download video (paste URL)
+Name[pl]=Pobierz film (wklej URL)
+Name[de]=Video herunterladen (URL einfügen)
+Name[fr]=Télécharger la vidéo (coller URL)
+Name[es]=Descargar vídeo (pegar URL)
+Name[it]=Scarica video (incolla URL)
+Name[ru]=Загрузить видео (вставить URL)
+Name[zh_CN]=下载视频 (粘贴 URL)
+Exec=$SCRIPTS/download-yt.sh %f
+Icon=download
+EOF
+
+  # === Skrypt download-yt.sh ===
+  cat > "$SCRIPTS/download-yt.sh" <<'EOF2'
+#!/usr/bin/env bash
+lang=${LANG:0:2}
+
+# unikalna nazwa pliku docelowego
+unique_name() {
+  n="$1"; b="${n%.*}"; e="${n##*.}"; o="$n"; i=2
+  while [ -e "$o" ]; do o="${b}_$i.$e"; ((i++)); done
+  echo "$o"
+}
+
+if ! command -v yt-dlp &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak yt-dlp" ;;
+    de) kdialog --error "❌ yt-dlp fehlt" ;;
+    fr) kdialog --error "❌ yt-dlp est manquant" ;;
+    es) kdialog --error "❌ Falta yt-dlp" ;;
+    it) kdialog --error "❌ yt-dlp mancante" ;;
+    ru) kdialog --error "❌ yt-dlp отсутствует" ;;
+    zh) kdialog --error "❌ 缺少 yt-dlp" ;;
+  esac
+  exit 1
+fi
+
+if ! command -v xclip &>/dev/null && ! command -v xsel &>/dev/null; then
+  case $lang in
+    pl) kdialog --error "❌ Brak xclip/xsel" ;;
+    de) kdialog --error "❌ xclip/xsel fehlt" ;;
+    fr) kdialog --error "❌ xclip/xsel est manquant" ;;
+    es) kdialog --error "❌ Falta xclip/xsel" ;;
+    it) kdialog --error "❌ xclip/xsel mancante" ;;
+    ru) kdialog --error "❌ xclip/xsel отсутствует" ;;
+    zh) kdialog --error "❌ 缺少 xclip/xsel" ;;
+  esac
+  exit 1
+fi
+
+target="$1"
+if [ -z "$target" ] || [ "$target" = "." ]; then outdir="$(pwd)"
+elif [ -d "$target" ]; then outdir="$target"
+else outdir="$(dirname "$target")"; fi
+cd "$outdir" || exit 1
+
+# pobierz URL
+url=$(xclip -o -selection clipboard 2>/dev/null || xsel -ob 2>/dev/null)
+[ -z "$url" ] && url=$(kdialog --inputbox "Podaj URL") || true
+[ -z "$url" ] && exit 0
+
+# wybór formatu
+choice=$(kdialog --menu "Format:" mp4 "Video MP4" mp3 "Audio MP3") || exit 0
+
+if [ "$choice" = mp3 ]; then
+  outfile=$(yt-dlp --get-filename -x --audio-format mp3 -o "%(title)s.%(ext)s" "$url" | head -n1)
+  finalfile=$(unique_name "$outfile")
+  konsole -e yt-dlp -x --audio-format mp3 -o "$finalfile" "$url"
+else
+  qual=$(kdialog --menu "Rozdzielczość" best "Najlepsza" 480p "480p" 720p "720p" 1080p "1080p" 2160p "2160p") || exit 0
+  case "$qual" in
+    480p) fmt="bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/mp4";;
+    720p) fmt="bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/mp4";;
+    1080p) fmt="bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/mp4";;
+    2160p) fmt="bestvideo[height<=2160][ext=mp4]+bestaudio[ext=m4a]/mp4";;
+    best) fmt="bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4";;
+  esac
+  outfile=$(yt-dlp --get-filename -f "$fmt" -o "%(title)s.%(ext)s" "$url" | head -n1)
+  finalfile=$(unique_name "$outfile")
+  konsole -e yt-dlp -f "$fmt" -o "$finalfile" "$url"
+fi
+
+[ -n "$finalfile" ] && case $lang in
+  pl) kdialog --msgbox "✅ Zapisano: $outdir/$finalfile" ;;
+  de) kdialog --msgbox "✅ Gespeichert: $outdir/$finalfile" ;;
+  fr) kdialog --msgbox "✅ Enregistré: $outdir/$finalfile" ;;
+  es) kdialog --msgbox "✅ Guardado: $outdir/$finalfile" ;;
+  it) kdialog --msgbox "✅ Salvato: $outdir/$finalfile" ;;
+  ru) kdialog --msgbox "✅ Сохранено: $outdir/$finalfile" ;;
+  zh) kdialog --msgbox "✅ 已保存: $outdir/$finalfile" ;;
+esac
+EOF2
+
+  chmod +x "$SERVICES/Download-Video.desktop" "$SCRIPTS"/download-yt.sh
+  say "✅ Zainstalowano Downloader" \
+      "✅ Downloader installiert" \
+      "✅ Téléchargeur installé" \
+      "✅ Descargador instalado" \
+      "✅ Downloader installato" \
+      "✅ Загрузчик установлен" \
+      "✅ 已安装下载器"
+}
+
+uninstall_all() {
+  rm -f "$SERVICES/Download-Video.desktop" "$SCRIPTS"/download-yt.sh
+  say "🗑 Usunięto Downloader" \
+      "🗑 Downloader entfernt" \
+      "🗑 Téléchargeur supprimé" \
+      "🗑 Descargador eliminado" \
+      "🗑 Downloader rimosso" \
+      "🗑 Загрузчик удалён" \
+      "🗑 已删除下载器"
+}
+
+# ==== MENU ====
+say "🐬 Image Tools Installer  1 Instaluj, 2 Odinstaluj, 3 Wyjście" \
+    "🐬 Bild-Tools Installer  1 Installieren, 2 Deinstallieren, 3 Beenden" \
+    "🐬 Installateur Outils Image  1 Installer, 2 Supprimer, 3 Quitter" \
+    "🐬 Instalador Herramientas Imagen  1 Instalar, 2 Desinstalar, 3 Salir" \
+    "🐬 Installer Strumenti Immagine  1 Installa, 2 Rimuovi, 3 Esci" \
+    "🐬 Установщик Инструментов Изображений  1 Установить, 2 Удалить, 3 Выход" \
+    "🐬 图像工具安装程序  1 安装, 2 卸载, 3 退出"
+
+read -rp "👉 " choice
+
+case "$choice" in
+  1) install_all ;;
+  2) uninstall_all ;;
+  3) exit 0 ;;
+  *) say "❌ Nieprawidłowy wybór" \
+         "❌ Ungültige Wahl" \
+         "❌ Choix invalide" \
+         "❌ Opción inválida" \
+         "❌ Scelta non valida" \
+         "❌ Неверный выбор" \
+         "❌ 无效的选择"; exit 1 ;;
+esac
+EOS
+)
