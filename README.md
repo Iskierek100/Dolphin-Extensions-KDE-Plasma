@@ -115,18 +115,6 @@ tesseract poppler-tools yt-dlp spectacle xclip
 - Adds context entry **“Download video (paste URL)”** available on folders.  
 - Reads URL from clipboard or prompt.  
 - Lets you choose MP3 (audio) or MP4 (video with quality).  
-- Uses **yt-dlp**, a powerful tool that supports **not only YouTube** but also:
-  - Facebook Reels, Instagram, TikTok, Twitter/X  
-  - Twitch streams, Vimeo, Bandcamp, SoundCloud  
-  - Streaming services using `.m3u8` playlists (e.g. VOE, many live streams or news sites)  
-- Automatically merges the best video and audio into one file (requires `ffmpeg`).  
-- Can also download subtitles when available.  
-
-
-> 💡 **Did you know?**  
-> `yt-dlp` is *not just for YouTube*!  
-> It supports **thousands of websites** and streaming protocols.  
-> You can grab short clips, Facebook/Instagram reels, TikTok videos, music from Bandcamp or SoundCloud, Twitch streams, or even assemble `.m3u8` live streams into a single playable MP4.
 
 ---
 
@@ -162,16 +150,80 @@ Each module is localized into:
 - 🇷🇺 Russian  
 - 🇨🇳 Simplified Chinese  
 
-Fallback = English if `$LANG` not matched.  
+Fallback = English if `$LANG` not matched. 
 
 ---
 
-## 📋 Development
+# ❓ FAQ – Dolphin ServiceMenu Tools
 
-This is a **modular toolkit** – install whatever modules you want.  
-To add your own tool:  
-- Create `.desktop` entry in `~/.local/share/kio/servicemenus/`.  
-- Place the script in `~/.local/share/dolphin-scripts/`.  
+### 🔹 Do I need root privileges to install these addons?
+**No.** All scripts install into your user directory (`~/.local/share/`).  
+No system packages are touched. You can add or remove them anytime.
 
-Everything is transparent, editable, and user‑level.  
-Feel free to expand, customize, and share 🚀
+---
+
+### 🔹 Does installing these modify Dolphin or Plasma?
+**No.** They only add `.desktop` entries (ServiceMenu files) and small bash scripts.  
+If you uninstall → Dolphin goes back to its default menus unchanged.
+
+---
+
+### 🔹 What dependencies are needed?
+Each tool uses well‑known open source packages:
+- `ffmpeg`, `ffprobe` → audio/video handling  
+- `imagemagick`, `optipng`, `jpegoptim` → images  
+- `poppler-utils` → PDF manipulation  
+- `tesseract-ocr` → OCR text recognition  
+- `yt-dlp` (+ `ffmpeg`) → video/audio downloader  
+- `spectacle`, `xclip`/`xsel` → screenshots & clipboard  
+
+Install instructions for each distro are listed above in [Dependencies](#-dependencies).
+
+---
+
+### 🔹 What video sites can be downloaded?
+The **Download Video Tools** use `yt-dlp`. Despite its name, this is **not only YouTube**.  
+It supports **thousands of websites**, including:
+- YouTube, Vimeo, Twitch, DailyMotion  
+- Facebook Reels, Instagram, TikTok, Twitter/X  
+- SoundCloud, Bandcamp, Mixcloud  
+- News/media sites and any `.m3u8`/HLS based streaming  
+
+If your browser can play it → `yt-dlp` can usually download it.  
+It automatically merges best video + audio into one MP4 or extracts MP3 if you wish.
+
+---
+
+### 🔹 What apps can I uninstall now?
+These ServiceMenus replace most one-purpose GUI tools or browser plugins, for example:
+- Flatpak **VideoDownloader**, ClipGrab, youtube-dl GUIs, browser download add-ons  
+- Online PDF converters (“PDF → JPG → upload → download”)  
+- GUI image converters/resizers like XnConvert (for basic tasks)  
+- Online OCR web pages or heavy desktop OCR GUIs  
+- HandBrake (for simple conversions), online audio/video converters  
+- Manual workflows with Spectacle + moving files  
+
+👉 Everything is now available **integrated in Dolphin**: right click → *Modify selected file* or → *Download video / Take screenshot*.
+
+---
+
+### 🔹 Can I use these safely on system files?
+Yes – they only act on the files you explicitly click.  
+New results are created as separate files (with suffix `_conv`, `_resize`, `_ocr`, etc.).  
+Your original files remain untouched unless you manually delete them.
+
+---
+
+### 🔹 Can I extend these tools?
+Absolutely ✅  
+The system is modular:
+- New tools can be added by creating a `.desktop` file in `~/.local/share/kio/servicemenus`  
+- Scripts go into `~/.local/share/dolphin-scripts`  
+
+All scripts here are open bash, so you can easily adjust them or write your own.
+
+---
+
+## 🚀 In Short
+These addons turn Dolphin into a **Swiss‑army knife** for documents, images, videos, audio, screenshots, OCR and downloads – no extra software GUIs or browser extensions needed.  
+Right click → Done. 🎉 
