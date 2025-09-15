@@ -111,13 +111,22 @@ tesseract poppler-tools yt-dlp spectacle xclip
 
 ---
 
-### 📥 [Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)
+### 📥 [Download Video Tools](./Download-video-yt-dlp-terminal_paste_code.txt)
 - Adds context entry **“Download video (paste URL)”** available on folders.  
 - Reads URL from clipboard or prompt.  
 - Lets you choose MP3 (audio) or MP4 (video with quality).  
-- Downloads via `yt-dlp` directly into the folder.  
+- Uses **yt-dlp**, a powerful tool that supports **not only YouTube** but also:
+  - Facebook Reels, Instagram, TikTok, Twitter/X  
+  - Twitch streams, Vimeo, Bandcamp, SoundCloud  
+  - Streaming services using `.m3u8` playlists (e.g. VOE, many live streams or news sites)  
+- Automatically merges the best video and audio into one file (requires `ffmpeg`).  
+- Can also download subtitles when available.  
 
-**Usage:** Right‑click empty space in a folder → Download video.  
+
+> 💡 **Did you know?**  
+> `yt-dlp` is *not just for YouTube*!  
+> It supports **thousands of websites** and streaming protocols.  
+> You can grab short clips, Facebook/Instagram reels, TikTok videos, music from Bandcamp or SoundCloud, Twitch streams, or even assemble `.m3u8` live streams into a single playable MP4.
 
 ---
 
@@ -165,5 +174,4 @@ To add your own tool:
 - Place the script in `~/.local/share/dolphin-scripts/`.  
 
 Everything is transparent, editable, and user‑level.  
-
-Feel free to expand, customize, and share 🚀  
+Feel free to expand, customize, and share 🚀
