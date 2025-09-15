@@ -50,6 +50,7 @@ Each module uses common Linux packages. Please install them first:
 ```bash
 sudo apt install ffmpeg ffprobe imagemagick optipng jpegoptim \
 tesseract-ocr poppler-utils yt-dlp spectacle xclip
+```
 
 ### Arch Linux / Manjaro
 ```bash
