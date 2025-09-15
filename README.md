@@ -35,10 +35,10 @@ To uninstall: rerun the script → choose option `2 Uninstall`.
 |--------|---------|--------------|
 | **[Documents Tools](./Documents-tools-terminal_paste_code.txt)** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
 | **[Images Tools](./Images-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)`, `Optimize`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
+| **[Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)** | Modify existing images: Optimize PNG/JPG, Convert to other formats | `imagemagick`, `optipng`, `jpegoptim`, `kdialog` |
 | **[OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
 | **[Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
 | **[Download Video Tools](./Download-video-yt-dlp-terminal-paste-code.txt)** | `Download video (paste URL)` → MP4 (quality) / MP3 | `yt-dlp`, `xclip`/`xsel`, `konsole` *(optional)*, `kdialog` |
-| **[Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)** | Modify existing images: Optimize PNG/JPG, Convert to other formats | `imagemagick`, `optipng`, `jpegoptim`, `kdialog` |
 | **[Take Screenshot Tools](./Take-screenshot-terminal_paste_code.txt)** | Take screenshot & save into folder (Spectacle: Area / Full / Window) | `spectacle`, `xclip`/`xsel`, `kdialog` |
 
 ---
@@ -94,6 +94,13 @@ tesseract poppler-tools yt-dlp spectacle xclip
 
 ---
 
+### 🖼 [Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)
+- **Optimize**: compress PNG (optipng) or JPG (jpegoptim).  
+- **Convert**: convert screenshots/images between JPG, PNG, WebP, TIFF, BMP, GIF.  
+
+**Usage:** Right‑click existing image (e.g. a screenshot) → *Modify selected file*.  
+
+---
 ### 🔤 [OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)
 - **OCR → TXT**: Recognize text in image files (PNG/JPG/TIFF) using `tesseract`.  
 - Saves result as `*_ocr.txt`.  
@@ -117,14 +124,6 @@ tesseract poppler-tools yt-dlp spectacle xclip
 - Downloads via `yt-dlp` directly into the folder.  
 
 **Usage:** Right‑click empty space in a folder → Download video.  
-
----
-
-### 🖼 [Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)
-- **Optimize**: compress PNG (optipng) or JPG (jpegoptim).  
-- **Convert**: convert screenshots/images between JPG, PNG, WebP, TIFF, BMP, GIF.  
-
-**Usage:** Right‑click existing image (e.g. a screenshot) → *Modify selected file*.  
 
 ---
 
