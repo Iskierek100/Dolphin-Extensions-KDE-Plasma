@@ -69,8 +69,6 @@ sudo zypper install ffmpeg ImageMagick optipng jpegoptim \
 tesseract poppler-tools yt-dlp spectacle xclip
 ```
 
----
-
 ## 📂 Modules in Detail
 
 ### 📑 [Documents Tools](./Documents-tools-terminal_paste_code.txt)
