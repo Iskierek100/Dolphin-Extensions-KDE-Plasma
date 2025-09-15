@@ -34,7 +34,7 @@ To uninstall: rerun the script → choose option `2 Uninstall`.
 | Module | Actions | Dependencies |
 |--------|---------|--------------|
 | **[Documents Tools](./Documents-tools-terminal_paste_code.txt)** | `PDF → TXT`, `PDF → PNG (page range)` | `poppler-utils` (`pdftotext`, `pdftoppm`), `kdialog` |
-| **[Images Tools](./Images-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)`, `Optimize`, `Convert (JPG/PNG/WebP/TIFF/BMP/GIF)` | `imagemagick (convert/magick)`, `optipng`, `jpegoptim`, `kdialog` |
+| **[Images Tools](./Images-tools-terminal_paste_code.txt)** | `Resize (%)`, `Resize (px)` | `imagemagick (convert/magick)`, `kdialog` |
 | **[Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)** | Modify existing images: Optimize PNG/JPG, Convert to other formats | `imagemagick`, `optipng`, `jpegoptim`, `kdialog` |
 | **[OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)** | `OCR → TXT` (from PNG/JPG/TIFF) | `tesseract-ocr`, `kdialog` |
 | **[Multimedia Tools](./Multimedia-tools-terminal_paste_code.txt)** | `Convert (audio/video)`, `Resize (target MB)` | `ffmpeg`, `ffprobe`, `kdialog` |
@@ -83,22 +83,13 @@ tesseract poppler-tools yt-dlp spectacle xclip
 
 ---
 
-### 🖼 [Images Tools](./Images-tools-terminal_paste_code.txt)
-- **Resize % / px**: Scale images proportionally or to fixed dimensions (ImageMagick).  
-- **Optimize**:  
-  - PNG → `optipng` (lossless)  
-  - JPG → `jpegoptim` (quality ≈85%)  
-- **Convert**: output to JPG, PNG, WebP, TIFF, BMP, GIF.  
-
-**Usage:** Right‑click on an image → *Modify selected file*.  
+---  
 
 ---
 
 ### 🖼 [Images Modify Tools](./Images-modify-tools-terminal_paste_code.txt)
 - **Optimize**: compress PNG (optipng) or JPG (jpegoptim).  
 - **Convert**: convert screenshots/images between JPG, PNG, WebP, TIFF, BMP, GIF.  
-
-**Usage:** Right‑click existing image (e.g. a screenshot) → *Modify selected file*.  
 
 ---
 ### 🔤 [OCR Tools](./OCR-to-TXT-terminal_paste_code.txt)
