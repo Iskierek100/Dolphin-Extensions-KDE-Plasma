@@ -167,4 +167,3 @@ To add your own tool:
 Everything is transparent, editable, and user‑level.  
 
 Feel free to expand, customize, and share 🚀  
-```
