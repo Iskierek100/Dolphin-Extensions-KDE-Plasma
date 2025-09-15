@@ -86,7 +86,7 @@ tesseract poppler-tools yt-dlp spectacle xclip
 ### 🖼 [Images Tools](./Images-tools-terminal_paste_code.txt)
 - **Resize % / px**: Scale images proportionally or to fixed dimensions (ImageMagick).  
 
-**Usage:** Right‑click on an image → *Modify selected file*.   
+**Usage:** Right‑click on an image → *Modify selected file* → Resize (%), Resize (px)
 
 ---
 
